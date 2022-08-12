@@ -12,11 +12,16 @@ export const testHttpConnector = () => describe(`http connector`, () => {
     before(() => {
         server.start();
     });
-
+    
     after(() => {
+        conn.close();
         server.stop();
     });
-
+    
+    it(`open`, async () => {
+        await conn.open();
+        assert.isTrue(conn.connected);
+    });
     it(`post`, async () => {
         const ret = await conn.post("/post", { a: "hello world" });
         assert.equal((ret as any).a, "hello world");
@@ -34,7 +39,6 @@ export const testHttpConnector = () => describe(`http connector`, () => {
                 //
             });
     });
-
     it(`get post only url`, async () => {
         conn.get("/post", { a: "hello world" })
             .then(() => assert.fail("should failed"))
@@ -42,13 +46,11 @@ export const testHttpConnector = () => describe(`http connector`, () => {
                 //
             });
     });
-
     it(`get token`, async () => {
         const ret = await conn.get<{ token: string }>("/login");
         token = ret.token;
         conn.setAuth(token);
     });
-
     it(`access secret`, async () => {
         const ret = await conn.get<{ message: string }>("/secret");
         assert.equal(ret.message, "secret world");
@@ -62,5 +64,9 @@ export const testHttpConnector = () => describe(`http connector`, () => {
                 const e: AxiosError = err;
                 assert.equal(e.response?.status, 401, `${JSON.stringify(e.response?.status)}`);
             })
+    });
+    it(`close`, async () => {
+        conn.close();
+        assert.isFalse(conn.connected);
     });
 });

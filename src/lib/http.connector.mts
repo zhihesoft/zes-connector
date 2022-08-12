@@ -17,21 +17,41 @@ export class HttpConnector extends Connector {
         baseURL: string
     ) {
         super(baseURL);
-        this.net = axios.default.create({
-            baseURL,
-            timeout: 1000,
-        })
     }
 
-    private net: AxiosInstance;
+    private net: AxiosInstance | undefined;
+
+    override async open(): Promise<boolean> {
+
+        if (this.net) {
+            throw new Error(`connector is already open`);
+        }
+
+        this.net = axios.default.create({
+            baseURL: this.baseURL,
+            timeout: 1000,
+        });
+
+        return true;
+    }
+
+    override close(): void {
+        this.net = undefined;
+    }
+
+    override get connected(): boolean {
+        return this.net != undefined;
+    }
 
     setAuth(token?: string): void {
-        if (token) {
-            token = `Bearer ${token}`;
-        } else {
-            token = "";
+        if (this.net) {
+            if (token) {
+                token = `Bearer ${token}`;
+            } else {
+                token = "";
+            }
+            this.net.defaults.headers.common['Authorization'] = token;
         }
-        this.net.defaults.headers.common['Authorization'] = token;
     }
 
     async get<T>(url: string, args?: unknown): Promise<T> {
@@ -42,9 +62,15 @@ export class HttpConnector extends Connector {
         return this.send(url, args, HttpMethod.post);
     }
 
+    async send<T>(url: string): Promise<T>;
     async send<T>(url: string, args: unknown): Promise<T>;
     async send<T>(url: string, args: unknown, method: string): Promise<T>
-    async send<T>(url: string, args: unknown, method?: string): Promise<T> {
+    async send<T>(url: string, args?: unknown, method?: string): Promise<T> {
+
+        if (!this.net) {
+            throw new Error(`connector is not open`);
+        }
+
         method = method ?? HttpMethod.get;
         const cfg: AxiosRequestConfig = {
             url: url,

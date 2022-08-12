@@ -1,6 +1,6 @@
 {
   "name": "zes-connector",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "type": "module",
   "description": "connector library",
   "main": "./dist/index.mjs",
@@ -24,6 +24,7 @@
   "homepage": "https://github.com/zhihesoft/zes-connector#readme",
   "dependencies": {
     "axios": "^0.27.2",
+    "uninstall": "^0.0.0",
     "zes-util": "^1.0.5"
   },
   "devDependencies": {
