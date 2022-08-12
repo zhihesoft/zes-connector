@@ -1,4 +1,4 @@
-import { Connector } from "./connector.js";
+import { Connector } from "./connector.mjs";
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 
 export const HttpMethod = {
@@ -27,18 +27,18 @@ export class HttpConnector extends Connector {
 
     setAuth(token?: string): void {
         if (token) {
-            token = `Bear ${token}`;
+            token = `Bearer ${token}`;
         } else {
             token = "";
         }
         this.net.defaults.headers.common['Authorization'] = token;
     }
 
-    async get<T>(url: string, args: unknown): Promise<T> {
+    async get<T>(url: string, args?: unknown): Promise<T> {
         return this.send(url, args, HttpMethod.get);
     }
 
-    async post<T>(url: string, args: unknown): Promise<T> {
+    async post<T>(url: string, args?: unknown): Promise<T> {
         return this.send(url, args, HttpMethod.post);
     }
 
