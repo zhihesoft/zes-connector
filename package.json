@@ -23,8 +23,7 @@
   },
   "homepage": "https://github.com/zhihesoft/zes-connector#readme",
   "dependencies": {
-    "axios": "^0.27.2",
-    "zes-util": "^1.0.5"
+    "axios": "^0.27.2"
   },
   "devDependencies": {
     "@types/chai": "^4.3.1",
